@@ -18,7 +18,7 @@ class Station
 
   def count_trains_by(type)
     trains = trains_by(type)
-    trains.size()
+    trains.size
   end
 
   def send_train(train)
