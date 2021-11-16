@@ -12,11 +12,13 @@ class Station
   end
 
 
-  def type_trains
-    freight_trains = trains.find_all { |train| train.type == "freight"} 
-    passenger_trains = trains.find_all { |train| train.type == "passenger"} 
-    puts @freight_size = freight_trains.size
-    puts @passenger_size = passenger_trains.size
+  def trains_by(type)
+    trains.find_all { |train| train.type == type}  
+  end
+
+  def count_trains_by(type)
+    trains = trains_by(type)
+    trains.size()
   end
 
   def send_train(train)

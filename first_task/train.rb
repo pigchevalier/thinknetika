@@ -35,19 +35,18 @@ class Train
   end
 
   def forward
-    if @index_current_station<@route.stations.size
-      @index_current_station+=1
-      previous_station.send_train(self)
-      current_station.take_train(self)
-    end
+    return unless next_station
+    @index_current_station+=1
+    previous_station.send_train(self)
+    current_station.take_train(self)
+    
   end
 
   def back
-    if @index_current_station>0
-      @index_current_station-=1 
-      next_station.send_train(self)
-      current_station.take_train(self)
-    end
+    return unless previous_station
+    @index_current_station-=1 
+    next_station.send_train(self)
+    current_station.take_train(self)
   end
 
   def next_station
