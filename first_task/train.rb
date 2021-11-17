@@ -20,6 +20,7 @@ class Train
   
 
   def hook_up_car(car)
+    return if car.type != type
     if speed == 0
       cars.push(car)
     end

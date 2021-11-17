@@ -2,9 +2,9 @@ require_relative 'car'
 
 class CargoCar < Car
 
-protected
+private
 
-# protected в базовом классе, значит и тут тоже
+# private тк используется только в этом классе
 
 def type_car
   "Cargo"

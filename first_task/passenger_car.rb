@@ -4,9 +4,9 @@ class PassengerCar < Car
 
 
 
-protected
+private
 
-# protected в базовом классе, значит и тут тоже
+# private тк используется только в этом классе
 
 def type_car
   "Passenger"
