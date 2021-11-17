@@ -1,5 +1,7 @@
 class Route
 
+  # все методы вызываются в классе Prog (отвечает за меню), следовательно public
+
   attr_reader :stations
   
   def initialize (first_station, last_station)
@@ -8,7 +10,7 @@ class Route
     @stations << last_station
   end
 
-  def add_station(station, position = stations.size-1)
+  def add_station(station, position = stations.size - 1)
     stations.insert(position, station) if position < stations.size && position > 0
   end
 
