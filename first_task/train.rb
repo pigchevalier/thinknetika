@@ -19,9 +19,8 @@ class Train
 
   
 
-  def hook_up_car
+  def hook_up_car(car)
     if speed == 0
-      car = Car.new
       cars.push(car)
     end
   end

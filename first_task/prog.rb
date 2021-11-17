@@ -1,8 +1,40 @@
 class Prog
 
-  # поскольку все методы вызываются из main, они все public
+  # поскольку этот метод вызывается из main, он  public
 
-  
+  def menu
+    while true do
+      puts "Введите номер команды"
+      puts "1 Создать станцию"
+      puts "2 Создать поезд"
+      puts "3 Создать маршрут"
+      puts "4 Перейти к управлению станцией"
+      puts "5 Перейти к управлению поездом"
+      puts "6 Перейти к управлению маршрутом"
+      puts "7 Закончить работу"
+    
+      command = gets.chomp.to_i
+    
+      case command
+      when 1
+        create_station
+      when 2
+        create_train
+      when 3
+        create_route
+      when 4
+        control_station
+      when 5
+        control_train
+      when 6
+        control_route
+      when 7
+        break
+      else
+        puts "Неправильная команда"
+      end
+    end 
+  end
 
   def initialize
     @main_trains = []
@@ -10,7 +42,11 @@ class Prog
     @main_routes = []
   end
 
+  private
 
+  # поскольку методы ниже вызываются только из метода menu или других методов этого класса, они  private
+
+  attr_accessor :main_trains, :main_stations, :main_routes
 
   def create_station
     puts "Введите название станции"
@@ -22,10 +58,6 @@ class Prog
       puts "Такая станция уже существует"
     end
   end
-  
-  
-  
-  
   
   def create_train
     puts "Введите номер поезда"
@@ -46,10 +78,6 @@ class Prog
       puts "Поезд с таким номером уже существует"
     end
   end
-  
-  
-  
-  
   
   def create_route
     
@@ -72,13 +100,8 @@ class Prog
     end
   
     main_routes.push(Route.new(first_station,last_station))
-    puts "Маршрут создан"
-  
+    puts "Маршрут создан"  
   end
-  
-  
-  
-  
   
   def control_station
     puts "Введите название станции"
@@ -114,16 +137,7 @@ class Prog
           puts "Неправильный тип"
         end
       when 3
-        puts "Выберите тип: 1-грузовой, 2-пассажирский"
-        type = gets.chomp.to_i
-        case type
-        when 1
-          puts "Количество: #{station.count_trains_by("Cargo")}"
-        when 2
-          puts "Количество: #{station.count_trains_by("Passenger")}"
-        else
-          puts "Неправильная команда"
-        end
+        watch_count_on_station(station)
       when 4
         break
       else
@@ -132,10 +146,19 @@ class Prog
     end
   end
   
-  
-  
-  
-  
+  def watch_count_on_station(station)
+    puts "Выберите тип: 1-грузовой, 2-пассажирский"
+    type = gets.chomp.to_i
+    case type
+    when 1
+      puts "Количество: #{station.count_trains_by("Cargo")}"
+    when 2
+      puts "Количество: #{station.count_trains_by("Passenger")}"
+    else
+      puts "Неправильная команда"
+    end
+  end
+
   def control_train
     puts "Введите номер поезда"
     train_number = gets.chomp
@@ -160,29 +183,14 @@ class Prog
   
       case command
       when 1
-        i = 1
-        main_routes.each do |route| 
-          puts "Маршрут №#{i}"
-          i += 1 
-          route.all_stations
-        end
-        puts "Введите номер маршрута"
-  
-        route_index = gets.chomp.to_i - 1
-  
-        if route_index <= main_routes.size && route_index >= 0
-          route = main_routes[route_index]
-          train.assign_route(route)
-          puts "Маршрут назначен"
-        else
-          puts "Такого маршрута нет"
-        end
-  
+        assign_route(train)
       when 2
         puts "Введите количество вагонов"
         count = gets.chomp.to_i
         while count != 0 do
-          train.hook_up_car
+          car = CargoCar.new if train.type == "Cargo"
+          car = PassengerCar.new if train.type == "Passenger"
+          train.hook_up_car(car)
           count -= 1
         end
       when 3
@@ -203,10 +211,26 @@ class Prog
       end
     end
   end
+
+  def assign_route(train)
+    i = 1
+    main_routes.each do |route| 
+      puts "Маршрут №#{i}"
+      i += 1 
+      route.all_stations
+    end
+    puts "Введите номер маршрута"
   
+    route_index = gets.chomp.to_i - 1
   
-  
-  
+    if route_index <= main_routes.size && route_index >= 0
+      route = main_routes[route_index]
+      train.assign_route(route)
+      puts "Маршрут назначен"
+    else
+      puts "Такого маршрута нет"
+    end
+  end
   
   def control_route
   
@@ -241,32 +265,9 @@ class Prog
       when 1
         route.all_stations
       when 2
-        puts "Введите название станции"
-        station_name = gets.chomp
-        station = main_stations.find { |st| st.name == station_name}
-  
-        if station.nil? 
-          puts "Такой станции нет"
-          return
-        end
-  
-        puts "Введите позицию на которую хотите добавить станцию"
-        position = gets.chomp.to_i - 1
-  
-        route.add_station(station, position)
-  
+        add_station(route) 
       when 3
-        puts "Введите название станции"
-        station_name = gets.chomp
-        station = route.stations.find { |st| st.name == station_name}
-  
-        if station.nil? 
-          puts "Такой станции в маршруте нет"
-          return
-        end
-  
-        route.delete_station(station)
-        puts "Станция удалена"
+        delete_station(route)
       when 4
         break
       else
@@ -275,11 +276,29 @@ class Prog
     end
   end
 
+  def add_station(route)
+    puts "Введите название станции"
+    station_name = gets.chomp
+    station = main_stations.find { |st| st.name == station_name}
+    if station.nil? 
+      puts "Такой станции нет"
+      return
+    end
+    puts "Введите позицию на которую хотите добавить станцию"
+    position = gets.chomp.to_i - 1
+    route.add_station(station, position)
+  end
 
-  # все атрибуты используются только в этом классе, поэтому они все private
-  private 
-
-  attr_accessor :main_trains, :main_stations, :main_routes
-
+  def delete_station(route)
+    puts "Введите название станции"
+    station_name = gets.chomp
+    station = route.stations.find { |st| st.name == station_name}
+    if station.nil? 
+      puts "Такой станции в маршруте нет"
+      return
+    end
+    route.delete_station(station)
+    puts "Станция удалена"
+  end
 end
 
