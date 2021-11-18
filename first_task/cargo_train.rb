@@ -3,7 +3,6 @@ require_relative 'cargo_car'
 
 class CargoTrain < Train
 
-  self.count_elements = 0
 
   protected
 

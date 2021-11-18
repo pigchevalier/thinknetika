@@ -10,24 +10,18 @@ module InstanceCounter
     
     
     def instances
-      count_elements ||= 0
-      count_elements
+      @instances ||= 0
     end
 
-    def count_elements
-      @count_elements
-    end
-    def count_elements= var
-      @count_elements = var
-    end
+    attr_writer :instances
+    
   end
 
   module InstanceMethods
     protected
 
-    def register_instance
-      self.class.count_elements ||= 0     
-      self.class.count_elements += 1
+    def register_instance    
+      self.class.instances += 1
     end
   end
 end
