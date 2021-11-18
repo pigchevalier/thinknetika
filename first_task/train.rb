@@ -12,7 +12,6 @@ class Train
   attr_reader :speed, :type, :cars, :number
 
   @@all_trains = []
-  self.count_elements = 0
 
   def initialize(number, company_name)
     @number = number

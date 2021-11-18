@@ -10,6 +10,7 @@ module InstanceCounter
     
     
     def instances
+      count_elements ||= 0
       count_elements
     end
 
@@ -25,6 +26,7 @@ module InstanceCounter
     protected
 
     def register_instance
+      self.class.count_elements ||= 0     
       self.class.count_elements += 1
     end
   end

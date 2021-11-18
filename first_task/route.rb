@@ -7,8 +7,7 @@ class Route
   # все методы вызываются в классе Prog (отвечает за меню), следовательно public
 
   attr_reader :stations
-  
-  self.count_elements = 0
+
 
   
   def initialize (first_station, last_station)

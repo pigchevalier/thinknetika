@@ -10,7 +10,6 @@ class Station
 
 
   @@all_stations = []
-  self.count_elements = 0
 
   def initialize(name)
     @name = name
