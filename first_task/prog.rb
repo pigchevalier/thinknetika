@@ -37,8 +37,8 @@ class Prog
   end
 
   def initialize
-    @main_trains = []
-    @main_stations = []
+    #@main_trains = []
+    #@main_stations = []
     @main_routes = []
   end
 
@@ -46,14 +46,17 @@ class Prog
 
   # поскольку методы ниже вызываются только из метода menu или других методов этого класса, они  private
 
-  attr_accessor :main_trains, :main_stations, :main_routes
+  #attr_accessor :main_trains, :main_stations, :main_routes
+  attr_accessor :main_routes
 
   def create_station
     puts "Введите название станции"
     station_name = gets.chomp
-    station = main_stations.find { |st| st.name == station_name}
+    #station = main_stations.find { |st| st.name == station_name}
+    station = Station.all.find { |st| st.name == station_name}
     if station.nil? 
-      main_stations.push(Station.new(station_name))
+      #main_stations.push(Station.new(station_name))
+      Station.add_to_all(Station.new(station_name))
     else    
       puts "Такая станция уже существует"
     end
@@ -62,18 +65,23 @@ class Prog
   def create_train
     puts "Введите номер поезда"
     train_number = gets.chomp
-    train = main_trains.find { |tr| tr.number == train_number}
+    #train = main_trains.find { |tr| tr.number == train_number}
+    train = Train.find(train_number)
     if train.nil? 
       puts "Выберите тип: 1-грузовой, 2-пассажирский"
-        type = gets.chomp.to_i
-        case type
-        when 1
-          main_trains.push(CargoTrain.new(train_number))
-        when 2
-          main_trains.push(PassengerTrain.new(train_number))
-        else
-          puts "Неправильный тип"
-        end
+      type = gets.chomp.to_i
+      puts "Введите название компании"
+      company_name = gets.chomp
+      case type
+      when 1
+        #main_trains.push(CargoTrain.new(train_number, company_name))
+        Train.add_to_all(CargoTrain.new(train_number, company_name))
+      when 2
+        #main_trains.push(PassengerTrain.new(train_number, company_name))
+        Train.add_to_all(PassengerTrain.new(train_number, company_name))
+      else
+        puts "Неправильный тип"
+      end
     else    
       puts "Поезд с таким номером уже существует"
     end
@@ -83,7 +91,8 @@ class Prog
     
     puts "Введите название начальной станции"
     first_station_name = gets.chomp
-    first_station = main_stations.find { |st| st.name == first_station_name}
+    #first_station = main_stations.find { |st| st.name == first_station_name}
+    first_station = Station.all.find { |st| st.name == first_station_name}
   
     if first_station.nil? 
       puts "Такой станции нет"
@@ -92,7 +101,8 @@ class Prog
   
     puts "Введите название конечной станции"
     last_station_name = gets.chomp
-    last_station = main_stations.find { |st| st.name == last_station_name}
+    #last_station = main_stations.find { |st| st.name == last_station_name}
+    last_station = Station.all.find { |st| st.name == last_station_name}
   
     if last_station.nil? 
       puts "Такой станции нет"
@@ -106,7 +116,8 @@ class Prog
   def control_station
     puts "Введите название станции"
     station_name = gets.chomp
-    station = main_stations.find { |st| st.name == station_name}
+    #station = main_stations.find { |st| st.name == station_name}
+    station = Station.all.find { |st| st.name == station_name}
   
     if station.nil? 
       puts "Такой станции нет"
@@ -124,15 +135,15 @@ class Prog
   
       case command
       when 1
-        station.trains.each {|train| puts "Номер позда: #{train.number} , тип поезда: #{train.type}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
+        station.trains.each {|train| puts "Номер поезда: #{train.number} , тип поезда: #{train.type}, название компании: #{train.company_name}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
       when 2
         puts "Выберите тип: 1-грузовой, 2-пассажирский"
         type = gets.chomp.to_i
         case type
         when 1
-          station.trains_by("Cargo").each {|train| puts "Номер позда: #{train.number} , тип поезда: #{train.type}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
+          station.trains_by("Cargo").each {|train| puts "Номер поезда: #{train.number} , тип поезда: #{train.type}, название компании: #{train.company_name}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
         when 2
-          station.trains_by("Passenger").each {|train| puts "Номер позда: #{train.number} , тип поезда: #{train.type}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
+          station.trains_by("Passenger").each {|train| puts "Номер поезда: #{train.number} , тип поезда: #{train.type}, название компании: #{train.company_name}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
         else
           puts "Неправильный тип"
         end
@@ -162,8 +173,9 @@ class Prog
   def control_train
     puts "Введите номер поезда"
     train_number = gets.chomp
-    train = main_trains.find { |tr| tr.number == train_number}
-  
+    #train = main_trains.find { |tr| tr.number == train_number}
+    train = Train.find(train_number)
+
     if train.nil? 
       puts "Такого поезда нет"
       return
@@ -187,9 +199,11 @@ class Prog
       when 2
         puts "Введите количество вагонов"
         count = gets.chomp.to_i
+        puts "Введите название компании"
+        company_name = gets.chomp
         while count != 0 do
-          car = CargoCar.new if train.type == "Cargo"
-          car = PassengerCar.new if train.type == "Passenger"
+          car = CargoCar.new(company_name) if train.type == "Cargo"
+          car = PassengerCar.new(company_name) if train.type == "Passenger"
           train.hook_up_car(car)
           count -= 1
         end
@@ -279,7 +293,8 @@ class Prog
   def add_station(route)
     puts "Введите название станции"
     station_name = gets.chomp
-    station = main_stations.find { |st| st.name == station_name}
+    #station = main_stations.find { |st| st.name == station_name}
+    station = Station.all.find { |st| st.name == station_name}
     if station.nil? 
       puts "Такой станции нет"
       return
@@ -292,7 +307,8 @@ class Prog
   def delete_station(route)
     puts "Введите название станции"
     station_name = gets.chomp
-    station = route.stations.find { |st| st.name == station_name}
+    #station = route.stations.find { |st| st.name == station_name}
+    station = Station.all.find { |st| st.name == station_name}
     if station.nil? 
       puts "Такой станции в маршруте нет"
       return
