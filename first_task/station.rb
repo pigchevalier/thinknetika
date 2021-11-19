@@ -8,13 +8,22 @@ class Station
 
   attr_reader :name, :trains
 
+  NAME_FORMAT = /^[A-ZА-Я].*/
 
   @@all_stations = []
 
   def initialize(name)
     @name = name
     @trains = []
+    validate!
     register_instance
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
   end
 
   def self.all
@@ -48,6 +57,14 @@ class Station
     trains.size
   end
 
+
+  private
+
+  def validate!
+    raise "Station name can't be nil" if name.nil?
+    raise "Station name should be at least 3 symbols" if name.length < 3
+    raise "Station name has invalid format" if name !~ NAME_FORMAT 
+  end
   
 
 end

@@ -63,27 +63,42 @@ class Prog
   end
   
   def create_train
-    puts "Введите номер поезда"
-    train_number = gets.chomp
-    #train = main_trains.find { |tr| tr.number == train_number}
-    train = Train.find(train_number)
-    if train.nil? 
-      puts "Выберите тип: 1-грузовой, 2-пассажирский"
-      type = gets.chomp.to_i
-      puts "Введите название компании"
-      company_name = gets.chomp
-      case type
-      when 1
-        #main_trains.push(CargoTrain.new(train_number, company_name))
-        Train.add_to_all(CargoTrain.new(train_number, company_name))
-      when 2
-        #main_trains.push(PassengerTrain.new(train_number, company_name))
-        Train.add_to_all(PassengerTrain.new(train_number, company_name))
-      else
-        puts "Неправильный тип"
+    while true do
+      puts "Введите номер поезда"
+      train_number = gets.chomp
+      train = Train.find(train_number)
+      if train.nil? 
+        puts "Выберите тип: 1-грузовой, 2-пассажирский"
+        type = gets.chomp.to_i
+        puts "Введите название компании"
+        company_name = gets.chomp
+        case type
+        when 1
+          begin
+            Train.add_to_all(CargoTrain.new(train_number, company_name))
+            puts "Поезд успешно создан"
+            break
+          rescue RuntimeError => e
+            puts "Ошибка при вводе параметров:"
+            puts e.message
+            puts "Попробуйте ещё раз"
+          end
+        when 2
+          begin
+            Train.add_to_all(PassengerTrain.new(train_number, company_name))
+            puts "Поезд успешно создан"
+            break
+          rescue RuntimeError => e
+            puts "Ошибка при вводе параметров:"
+            puts e.message
+            puts "Попробуйте ещё раз"
+          end
+        else
+          puts "Неправильный тип"
+        end
+      else    
+        puts "Поезд с таким номером уже существует"
       end
-    else    
-      puts "Поезд с таким номером уже существует"
     end
   end
   
@@ -182,7 +197,7 @@ class Prog
     end
   
     while true do
-      puts "Пеозд на станции: #{train.current_station.name}" unless train.current_station.nil?
+      puts "Поезд на станции: #{train.current_station.name}" unless train.current_station.nil?
       puts "Введите номер команды"
       puts "1 Назачить маршрут"
       puts "2 Добавить вагоны"

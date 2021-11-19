@@ -11,6 +11,9 @@ class Train
 
   attr_reader :speed, :type, :cars, :number
 
+  NAME_FORMAT = /^[A-ZА-Я].*/
+  NUMBER_FORMAT = /^[a-zа-я0-9]{3}-?[a-zа-я0-9]{2}$/i
+
   @@all_trains = []
 
   def initialize(number, company_name)
@@ -19,7 +22,15 @@ class Train
     self.company_name = company_name
     @speed = 0
     @cars = []
-    register_instance
+    validate!
+    register_instance  
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
   end
 
   def self.add_to_all(train)
@@ -94,12 +105,14 @@ class Train
     @speed += speed
   end
 
-  protected
+  private
 
-  # этот метод вызывается только из класса, но должен быть переопределен в потомках, поэтому protected
-
-  def type_train
-    "nothing"
+  def validate!
+    raise "Train number has invalid format" if number !~ NUMBER_FORMAT
+    raise "Train type can't be nil" if type.nil? 
+    raise "Company name can't be nil" if company_name.nil?
+    raise "Company name should be at least 3 symbols" if company_name.length < 3
+    raise "Company name has invalid format" if company_name !~ NAME_FORMAT 
   end
 
 end
