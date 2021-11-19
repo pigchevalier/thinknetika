@@ -1,12 +1,28 @@
+require_relative 'instance_counter'
+
 class Station
+
+  include InstanceCounter
 
   # методы вызываются в классе Prog (отвечает за меню) и не только в нем, следовательно public
 
   attr_reader :name, :trains
 
+
+  @@all_stations = []
+
   def initialize(name)
     @name = name
     @trains = []
+    register_instance
+  end
+
+  def self.all
+    @@all_stations
+  end
+
+  def self.add_to_all(station)
+    @@all_stations.push(station)
   end
 
   # вызывается в классе Train, следовательно public

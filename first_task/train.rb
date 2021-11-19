@@ -1,22 +1,34 @@
 require_relative 'car'
+require_relative 'company.rb'
+require_relative 'instance_counter'
 
 class Train
 
+  include Company
+  include InstanceCounter
 
   # все методы ниже (до private) вызываются в других классах (например в Prog отвечающего за меню), поэтому public
 
   attr_reader :speed, :type, :cars, :number
 
+  @@all_trains = []
 
-  def initialize(number)
+  def initialize(number, company_name)
     @number = number
     @type = type_train
+    self.company_name = company_name
     @speed = 0
     @cars = []
-
+    register_instance
   end
 
+  def self.add_to_all(train)
+    @@all_trains.push(train)
+  end
 
+  def self.find(number)
+    @@all_trains.find { |tr| tr.number == number}
+  end
   
 
   def hook_up_car(car)
@@ -39,6 +51,7 @@ class Train
   def assign_route(route)
     @route = route
     @index_current_station = 0
+    current_station.send_train(self)
     current_station.take_train(self)
   end
 
