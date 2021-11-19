@@ -108,11 +108,22 @@ class Train
   private
 
   def validate!
+    validate_number!
+    validate_type!
+    validate_company_name!  
+  end
+
+  def validate_number!
     raise "Train number has invalid format" if number !~ NUMBER_FORMAT
+  end
+
+  def validate_type!
     raise "Train type can't be nil" if type.nil? 
+  end
+
+  def validate_company_name!
     raise "Company name can't be nil" if company_name.nil?
     raise "Company name should be at least 3 symbols" if company_name.length < 3
     raise "Company name has invalid format" if company_name !~ NAME_FORMAT 
   end
-
 end
