@@ -26,6 +26,10 @@ class Station
     false
   end
 
+  def each_train (&block)
+    trains.each{|train| block.call(train)}
+  end
+
   def self.all
     @@all_stations
   end

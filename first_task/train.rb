@@ -33,6 +33,10 @@ class Train
     false
   end
 
+  def each_car (&block)
+    cars.each{|car| block.call(car)}
+  end
+
   def self.add_to_all(train)
     @@all_trains.push(train)
   end

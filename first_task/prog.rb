@@ -150,7 +150,7 @@ class Prog
   
       case command
       when 1
-        station.trains.each {|train| puts "Номер поезда: #{train.number} , тип поезда: #{train.type}, название компании: #{train.company_name}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
+        station.each_train {|train| puts "Номер поезда: #{train.number} , тип поезда: #{train.type}, название компании: #{train.company_name}, скорость: #{train.speed} ,кол-во вагонов: #{train.numbers_car}"}
       when 2
         puts "Выберите тип: 1-грузовой, 2-пассажирский"
         type = gets.chomp.to_i
@@ -204,7 +204,10 @@ class Prog
       puts "3 Удалить вагоны"
       puts "4 Проехать вперед"
       puts "5 Проехать назад"
-      puts "6 Выход"
+      puts "6 Вывести список вагонов"
+      puts "7 Занять место в вагоне" if train.type == "Passenger"
+      puts "7 Занять объем в вагоне" if train.type == "Cargo"
+      puts "8 Выход"
   
       command = gets.chomp.to_i
   
@@ -212,16 +215,7 @@ class Prog
       when 1
         assign_route(train)
       when 2
-        puts "Введите количество вагонов"
-        count = gets.chomp.to_i
-        puts "Введите название компании"
-        company_name = gets.chomp
-        while count != 0 do
-          car = CargoCar.new(company_name) if train.type == "Cargo"
-          car = PassengerCar.new(company_name) if train.type == "Passenger"
-          train.hook_up_car(car)
-          count -= 1
-        end
+        add_car(train)
       when 3
         puts "Введите количество вагонов"
         count = gets.chomp.to_i
@@ -234,10 +228,40 @@ class Prog
       when 5
         train.back
       when 6
+        train.each_car{|car| puts "Название компании : #{car.company_name}, кол-во свободных мест : #{car.free_capacity}, кол-во занятых мест : #{car.occupied_capacity}"} if train.type == "Passenger"
+        train.each_car{|car| puts "Название компании : #{car.company_name}, свободный объем : #{car.free_capacity}, занятый объем : #{car.occupied_capacity}"} if train.type == "Cargo"
+      when 7
+        puts "Введите номер вагона"
+        car_index = gets.chomp.to_i
+        if car_index > train.cars.size || car_index < 1
+          puts "Такого вагона нет"
+        else
+          puts "Введите объём" if train.type == "Cargo"
+          capacity = gets.chomp.to_i if train.type == "Cargo"
+          train.cars[car_index - 1].take_the_place if train.type == "Passenger"
+          train.cars[car_index - 1].take_capacity(capacity) if train.type == "Cargo"
+        end
+      when 8
         break
       else
         puts "Неправильная команда"
       end
+    end
+  end
+
+  def add_car(train)
+    puts "Введите количество вагонов"
+    count = gets.chomp.to_i       
+    while count != 0 do
+      puts "Введите название компании"
+      company_name = gets.chomp 
+      puts "Введите кол-во мест в вагоне" if train.type == "Passenger"
+      puts "Введите общий объём вагона" if train.type == "Cargo"
+      capacity = gets.chomp.to_i
+      car = CargoCar.new(company_name, capacity) if train.type == "Cargo"
+      car = PassengerCar.new(company_name, capacity) if train.type == "Passenger"
+      train.hook_up_car(car)
+      count -= 1
     end
   end
 
