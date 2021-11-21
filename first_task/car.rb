@@ -4,12 +4,14 @@ class Car
 
   include Company
 
-  attr_reader :type
+  attr_reader :type, :capacity, :free_capacity
 
   NAME_FORMAT = /^[A-ZА-Я].*/
 
-  def initialize(company_name)
+  def initialize(company_name, capacity)
     @type = type_car 
+    @capacity = capacity
+    @free_capacity = capacity
     self.company_name = company_name
     validate!
   end
@@ -19,6 +21,10 @@ class Car
     true
   rescue
     false
+  end
+
+  def occupied_capacity
+    capacity - free_capacity
   end
 
   private
