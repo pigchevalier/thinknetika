@@ -1,37 +1,38 @@
 require_relative 'car'
 require_relative 'company.rb'
 require_relative 'instance_counter'
+require_relative 'validation.rb'
+require_relative 'accessor.rb'
 
 class Train
 
   include Company
   include InstanceCounter
+  include Validation
+  include Accessor
+
 
   # все методы ниже (до private) вызываются в других классах (например в Prog отвечающего за меню), поэтому public
 
-  attr_reader :speed, :type, :cars, :number
+  #attr_reader :speed, :type, :cars, :number
+  strong_attr_accessor :type , String
+  attr_accessor_with_history :speed, :number, :cars
 
-  NAME_FORMAT = /^[A-ZА-Я].*/
+  NAME_FORMAT = /^[A-ZА-Я].{2,}/
   NUMBER_FORMAT = /^[a-zа-я0-9]{3}-?[a-zа-я0-9]{2}$/i
 
   @@all_trains = []
 
   def initialize(number, company_name)
-    @number = number
-    @type = type_train
+    self.number = number
+    self.type = type_train
     self.company_name = company_name
-    @speed = 0
-    @cars = []
+    self.speed = 0
+    self.cars = []
     validate!
     register_instance  
   end
 
-  def valid?
-    validate!
-    true
-  rescue
-    false
-  end
 
   def each_car (&block)
     cars.each{|car| block.call(car)}
@@ -102,32 +103,32 @@ class Train
   end
 
   def stop
-    @speed = 0
+    self.speed = 0
   end
 
   def add_speed(speed)
-    @speed += speed
+    self.speed += speed
   end
 
   private
 
-  def validate!
-    validate_number!
-    validate_type!
-    validate_company_name!  
-  end
-
-  def validate_number!
-    raise "Train number has invalid format" if number !~ NUMBER_FORMAT
-  end
-
-  def validate_type!
-    raise "Train type can't be nil" if type.nil? 
-  end
-
-  def validate_company_name!
-    raise "Company name can't be nil" if company_name.nil?
-    raise "Company name should be at least 3 symbols" if company_name.length < 3
-    raise "Company name has invalid format" if company_name !~ NAME_FORMAT 
-  end
+  #def validate!
+  #  validate_number!
+  #  validate_type!
+  #  validate_company_name!  
+  #end
+#
+  #def validate_number!
+  #  raise "Train number has invalid format" if number !~ NUMBER_FORMAT
+  #end
+#
+  #def validate_type!
+  #  raise "Train type can't be nil" if type.nil? 
+  #end
+#
+  #def validate_company_name!
+  #  raise "Company name can't be nil" if company_name.nil?
+  #  raise "Company name should be at least 3 symbols" if company_name.length < 3
+  #  raise "Company name has invalid format" if company_name !~ NAME_FORMAT 
+  #end
 end
