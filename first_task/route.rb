@@ -28,7 +28,7 @@ class Route
   end
 
   def my_validate
-    self.class.massive = []
+    self.class.valid_array = []
     self.class.validate :first_station, :presence
     self.class.validate :last_station, :presence
     self.class.validate :first_station, :type, String

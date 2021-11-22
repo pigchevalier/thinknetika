@@ -27,7 +27,7 @@ class Station
   end
 
   def my_validate
-    self.class.massive = []
+    self.class.valid_array = []
     self.class.validate :name, :presence
     self.class.validate :name, :format, NAME_FORMAT
     self.class.validate :name, :type, String

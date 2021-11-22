@@ -35,7 +35,7 @@ class Train
   end
 
   def my_validate
-    self.class.massive =[]
+    self.class.valid_array =[]
     self.class.validate :number, :presence
     self.class.validate :number, :format, NUMBER_FORMAT
     self.class.validate :number, :type, String

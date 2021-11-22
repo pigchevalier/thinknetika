@@ -24,7 +24,7 @@ class Car
   end
 
   def my_validate
-    self.class.massive =[]
+    self.class.valid_array =[]
     self.class.validate :company_name, :presence
     self.class.validate :company_name, :format, NAME_FORMAT
     self.class.validate :company_name, :type, String
