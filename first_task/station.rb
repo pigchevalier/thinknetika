@@ -21,8 +21,16 @@ class Station
   def initialize(name)
     self.name = name
     self.trains = []
+    my_validate
     validate!
     register_instance
+  end
+
+  def my_validate
+    self.class.massive = []
+    self.class.validate :name, :presence
+    self.class.validate :name, :format, NAME_FORMAT
+    self.class.validate :name, :type, String
   end
 
   def each_train (&block)

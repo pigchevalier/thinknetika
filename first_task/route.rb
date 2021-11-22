@@ -22,10 +22,18 @@ class Route
     self.stations << last_station
     self.first_station = first_station
     self.last_station = last_station
+    my_validate
     validate!
     register_instance
   end
 
+  def my_validate
+    self.class.massive = []
+    self.class.validate :first_station, :presence
+    self.class.validate :last_station, :presence
+    self.class.validate :first_station, :type, String
+    self.class.validate :last_station, :type, String
+  end
 
   def add_station(station, position = stations.size - 1)
     stations.insert(position, station) if position < stations.size && position > 0

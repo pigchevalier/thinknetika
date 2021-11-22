@@ -29,10 +29,20 @@ class Train
     self.company_name = company_name
     self.speed = 0
     self.cars = []
+    my_validate
     validate!
     register_instance  
   end
 
+  def my_validate
+    self.class.massive =[]
+    self.class.validate :number, :presence
+    self.class.validate :number, :format, NUMBER_FORMAT
+    self.class.validate :number, :type, String
+    self.class.validate :company_name, :presence
+    self.class.validate :company_name, :format, NAME_FORMAT
+    self.class.validate :company_name, :type, String
+  end
 
   def each_car (&block)
     cars.each{|car| block.call(car)}

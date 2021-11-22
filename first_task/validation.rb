@@ -5,41 +5,37 @@ module Validation
   end
 
   module ClassMethods
-    def validate(obj, name, type_of_validate, option = nil)
-      var_name = "@#{name}"
-      if type_of_validate == :presence
-        raise "#{name} can't be nil" if obj.instance_variable_get(var_name).nil?
-        raise "#{name} can't be empty" if obj.instance_variable_get(var_name) == ""
-      elsif type_of_validate == :format
-        raise "#{name} has invalid format" if obj.instance_variable_get(var_name) !~ option
-      elsif type_of_validate == :type
-        raise "Wrong type of #{name}" if obj.instance_variable_get(var_name).class != option
-      end
+    attr_accessor :massive
+
+    def presence(var,params)
+      raise RuntimeError.new "can't be nil" if var.nil?
+      raise RuntimeError.new "can't be empty" if var == ""
+    end
+
+    def format(var,params)
+      raise RuntimeError.new "has invalid format" if var !~ params
+    end
+
+    def type(var,params)
+      raise RuntimeError.new "has wrong type" if var.class != params
+    end
+
+    def validate( name, type_of_validate, option = nil)     
+      self.massive.push({name: name.to_s, validation_type: type_of_validate.to_s, params: option})
     end
   end
 
   module InstanceMethods
     def validate!
-      if self.class == Car || self.class == CargoCar || self.class == PassengerCar
-        self.class.validate self, :company_name, :presence
-        self.class.validate self, :company_name, :format, self.class.const_get("NAME_FORMAT")
-        self.class.validate self, :company_name, :type, String
-      elsif self.class == Train || self.class == CargoTrain || self.class == PassengerTrain
-        self.class.validate self, :number, :presence
-        self.class.validate self, :number, :format, self.class.const_get("NUMBER_FORMAT")
-        self.class.validate self, :number, :type, String
-        self.class.validate self, :company_name, :presence
-        self.class.validate self, :company_name, :format, self.class.const_get("NAME_FORMAT")
-        self.class.validate self, :company_name, :type, String
-      elsif self.class == Station
-        self.class.validate self, :name, :presence
-        self.class.validate self, :name, :format, self.class.const_get("NAME_FORMAT")
-        self.class.validate self, :name, :type, String
-      elsif self.class == Route
-        self.class.validate self, :first_station, :presence
-        self.class.validate self, :last_station, :presence
-        self.class.validate self, :first_station, :type, Station
-        self.class.validate self, :last_station, :type, Station
+      self.class.massive.each do |mass| 
+        var_name = "@#{mass[:name]}"
+        var = instance_variable_get(var_name)
+        begin
+          self.class.send mass[:validation_type] , var, mass[:params]
+        rescue RuntimeError => e
+          puts "#{var_name} #{e.message}"
+          raise e
+        end
       end
     end
 

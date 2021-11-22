@@ -19,9 +19,16 @@ class Car
     self.capacity = capacity
     self.free_capacity = capacity
     self.company_name = company_name
+    my_validate
     validate!
   end
 
+  def my_validate
+    self.class.massive =[]
+    self.class.validate :company_name, :presence
+    self.class.validate :company_name, :format, NAME_FORMAT
+    self.class.validate :company_name, :type, String
+  end
 
   def occupied_capacity
     capacity - free_capacity
