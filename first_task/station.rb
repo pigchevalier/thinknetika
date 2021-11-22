@@ -1,33 +1,41 @@
 require_relative 'instance_counter'
+require_relative 'validation.rb'
+require_relative 'accessor.rb'
 
 class Station
 
   include InstanceCounter
+  include Validation
+  include Accessor
 
   # методы вызываются в классе Prog (отвечает за меню) и не только в нем, следовательно public
 
-  attr_reader :name, :trains
+  #attr_reader :name, :trains
+  strong_attr_accessor :name, String
+  attr_accessor_with_history :trains
 
-  NAME_FORMAT = /^[A-ZА-Я].*/
+  NAME_FORMAT = /^[A-ZА-Я].{2,}/
 
   @@all_stations = []
 
   def initialize(name)
-    @name = name
-    @trains = []
+    self.name = name
+    self.trains = []
+    my_validate
     validate!
     register_instance
   end
 
-  def valid?
-    validate!
-    true
-  rescue
-    false
+  def my_validate
+    self.class.valid_array = []
+    self.class.validate :name, :presence
+    self.class.validate :name, :format, NAME_FORMAT
+    self.class.validate :name, :type, String
   end
 
   def each_train (&block)
-    trains.each{|train| block.call(train)}
+    #trains.each{|train| block.call(train)}
+    trains.each{|train| yield(train)}
   end
 
   def self.all
@@ -41,13 +49,13 @@ class Station
   # вызывается в классе Train, следовательно public
 
   def take_train(train)
-    @trains << train
+    self.trains << train
   end
 
   # вызывается в классе Train, следовательно public
 
   def send_train(train)
-    @trains.delete(train)
+    self.trains.delete(train)
   end 
 
   # все методы ниже вызываются в классе Prog (отвечает за меню), следовательно public
@@ -57,18 +65,18 @@ class Station
   end
 
   def count_trains_by(type)
-    trains = trains_by(type)
-    trains.size
+    type_trains = trains_by(type)
+    type_trains.size
   end
 
 
   private
 
-  def validate!
-    raise "Station name can't be nil" if name.nil?
-    raise "Station name should be at least 3 symbols" if name.length < 3
-    raise "Station name has invalid format" if name !~ NAME_FORMAT 
-  end
+  #def validate!
+  #  raise "Station name can't be nil" if name.nil?
+  #  raise "Station name should be at least 3 symbols" if name.length < 3
+  #  raise "Station name has invalid format" if name !~ NAME_FORMAT 
+  #end
   
 
 end
